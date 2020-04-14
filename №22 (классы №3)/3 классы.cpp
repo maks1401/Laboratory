@@ -1,4 +1,5 @@
-﻿#include <iostream>
+//Трегубов Максим, лаб. №22, классы №3
+#include <iostream>
 #include "Money.h"
 
 using namespace std;
