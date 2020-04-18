@@ -1,4 +1,4 @@
-//Трегубов Максим, лаб. № 4 и 5
+//Трегубов Максим, лаб. № 4
 #include "Person.h"
 #include "EMPLOYEE.h"
 #include <iostream>
