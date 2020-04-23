@@ -1,4 +1,4 @@
-//Трегубов Максим, лаб. №25 (8к) 
+//РўСЂРµРіСѓР±РѕРІ РњР°РєСЃРёРј, Р»Р°Р±. в„–25 (8Рє)
 #include <iostream>
 #include "Dialog.hpp"
 #include<Windows.h>
