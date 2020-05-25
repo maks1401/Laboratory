@@ -208,6 +208,7 @@ namespace Project1
 			this->left->Size = System::Drawing::Size(86, 20);
 			this->left->TabIndex = 10;
 			this->toolTip1->SetToolTip(this->left, L"Начало интервала");
+			this->left->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &MyForm::left_KeyPress);
 			// 
 			// right
 			// 
@@ -216,6 +217,7 @@ namespace Project1
 			this->right->Size = System::Drawing::Size(86, 20);
 			this->right->TabIndex = 11;
 			this->toolTip1->SetToolTip(this->right, L"Конец интервала");
+			this->right->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &MyForm::right_KeyPress);
 			// 
 			// tochnost
 			// 
@@ -227,6 +229,7 @@ namespace Project1
 			this->tochnost->TabIndex = 9;
 			this->tochnost->Text = L"0,0001";
 			this->toolTip1->SetToolTip(this->tochnost, L"Введите точность чрез запятую");
+			this->tochnost->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &MyForm::tochnost_Press);
 			// 
 			// label2
 			// 
@@ -277,6 +280,7 @@ namespace Project1
 			this->toolTip1->SetToolTip(this->power2, L"Введите коэффицент перед старшей степенью X");
 			this->power2->Click += gcnew System::EventHandler(this, &MyForm::Power2_Click);
 			this->power2->TextChanged += gcnew System::EventHandler(this, &MyForm::Power2_Click);
+			this->power2->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &MyForm::Power2_KeyPress);
 			// 
 			// label7
 			// 
@@ -326,6 +330,7 @@ namespace Project1
 			this->power1->TextAlign = System::Windows::Forms::HorizontalAlignment::Center;
 			this->toolTip1->SetToolTip(this->power1, L"Введите коэффицент со знаком перед первой степенью X");
 			this->power1->Click += gcnew System::EventHandler(this, &MyForm::Power1_Click);
+			this->power1->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &MyForm::Power1_KeyPress);
 			// 
 			// power0
 			// 
@@ -342,6 +347,7 @@ namespace Project1
 			this->power0->TextAlign = System::Windows::Forms::HorizontalAlignment::Center;
 			this->toolTip1->SetToolTip(this->power0, L"Введите константу со знаком");
 			this->power0->Click += gcnew System::EventHandler(this, &MyForm::Power0_Click);
+			this->power0->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &MyForm::Power0_KeyPress);
 			// 
 			// label5
 			// 
@@ -502,10 +508,35 @@ namespace Project1
 
 		}
 #pragma endregion
+		String^ TorZ; // Точка или запятая
+
+	private: void checkTextBox(System::Windows::Forms::TextBox^ textBox, System::Windows::Forms::KeyPressEventArgs^ e) {
+		bool TZFound = false; // Разделительный знак найден?
+		String^ FirstChar; //знаки + и - разрешены первым символом
+		FirstChar = "";
+		if (textBox->Text->Length > 0) FirstChar = textBox->Text->Substring(0, 1);
+		bool badPosition = ((FirstChar == L"-" || FirstChar == L"+") && textBox->SelectionStart == 0);
+		if (Char::IsDigit(e->KeyChar) == true) {
+			if (badPosition) e->Handled = true;
+			return; //Найдена цифра
+		}
+		if (e->KeyChar == (char)Keys::Back) return; //Найден BackSpace
+		if (e->KeyChar == L'-' || e->KeyChar == L'+') {
+			if (FirstChar == L"-" || FirstChar == L"+") textBox->Text = textBox->Text->Substring(1);
+			if (textBox->SelectionStart == 0) return;
+		}
+		if (textBox->Text->IndexOf(TorZ) != -1) TZFound = true; //Найден разделитель целой и дробной частей
+		if (TZFound == true) { e->Handled = true; return; } //Уже есть, второй не добавляем
+		if (e->KeyChar.ToString() == TorZ && !badPosition) return; //А первый - можно
+		e->Handled = true; //Не разрешать дальнейшую обработку
+	}
 	
-private: System::Void MyForm_Load(System::Object ^ sender, System::EventArgs ^ e) {}
+private: System::Void MyForm_Load(System::Object ^ sender, System::EventArgs ^ e) {
+	TorZ = Globalization::NumberFormatInfo::CurrentInfo->NumberDecimalSeparator;
+}
 	private: System::Void Итераций_Click(System::Object^ sender, System::EventArgs^ e)
 	{
+		double x, y, z;
 		left->Enabled = false;
 		right->Enabled = false;
 		if (tochnost->TextLength == 0)
@@ -518,7 +549,14 @@ private: System::Void MyForm_Load(System::Object ^ sender, System::EventArgs ^ e
 				MessageBox::Show("Вы не ввели коэффиценты. Пожалуйста, введите коэффиценты", "Ошибка");
 			else
 			{
-				result->Text = System::Convert::ToString(root3(System::Convert::ToDouble(power2->Text), System::Convert::ToDouble(power1->Text), System::Convert::ToDouble(power0->Text), System::Convert::ToDouble(tochnost->Text), 0));
+				try
+				{
+					result->Text = System::Convert::ToString(root3(System::Convert::ToDouble(power2->Text), System::Convert::ToDouble(power1->Text), System::Convert::ToDouble(power0->Text), System::Convert::ToDouble(tochnost->Text), 0));
+				}
+				catch(...)
+				{
+					MessageBox::Show("Тип данных", "Ошибка");
+				}				
 				if (result->TextLength == 2 || result->TextLength == 1)
 					MessageBox::Show("Корней нет", "Ошибка");
 			}				
@@ -608,9 +646,39 @@ private: System::Void MyForm_Load(System::Object ^ sender, System::EventArgs ^ e
 			power2->Clear();
 		P2 = true;
 	}
-	private: System::Void ОПрограммеToolStripMenuItem_Click_1(System::Object^ sender, System::EventArgs^ e) {
+	private: System::Void ОПрограммеToolStripMenuItem_Click_1(System::Object^ sender, System::EventArgs^ e)
+	{
 	MessageBox::Show("Программу выполнил Трегубов Максим ИВТ-19-1Б. Калькулятор алгебраических уравнений.", "Информация");
 	}
+	private: System::Void Power2_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e) 
+	{
+		checkTextBox(power2, e);
+	}
+	private: System::Void Power1_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e)
+	{
+		checkTextBox(power1, e);
+	}
+	private: System::Void Power0_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e)
+	{
+		checkTextBox(power0, e);
+	}
+	private: System::Void left_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e) 
+	{
+		checkTextBox(left, e);
+	}
+	private: System::Void right_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e) 
+	{
+		checkTextBox(right, e);
+	}
+	private: System::Void tochnost_Press(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e) 
+	{
+		checkTextBox(tochnost, e);
+	}
 	private: System::Void Выход_Click(System::Object^ sender, System::EventArgs^ e) { Application::Exit(); }
+
+
+
+	
+
 };
 }
