@@ -174,7 +174,7 @@ namespace Project1
 			this->Ньютона->Size = System::Drawing::Size(143, 23);
 			this->Ньютона->TabIndex = 1;
 			this->Ньютона->Text = L"Ньютона";
-			this->toolTip1->SetToolTip(this->Ньютона, L"Для метода Ньютона введите интервал в котором находится корень");
+			this->toolTip1->SetToolTip(this->Ньютона, L"Для метода Ньютона введите интервал в котором находится корени");
 			this->Ньютона->UseVisualStyleBackColor = true;
 			this->Ньютона->Click += gcnew System::EventHandler(this, &MyForm::Ньютона_Click);
 			// 
@@ -187,7 +187,7 @@ namespace Project1
 			this->Итераций->Size = System::Drawing::Size(143, 23);
 			this->Итераций->TabIndex = 0;
 			this->Итераций->Text = L"Итераций";
-			this->toolTip1->SetToolTip(this->Итераций, L"Для метода итераций не нужен интервал");
+			this->toolTip1->SetToolTip(this->Итераций, L"Для метода итераций необходимо первое приблежение");
 			this->Итераций->UseVisualStyleBackColor = true;
 			this->Итераций->Click += gcnew System::EventHandler(this, &MyForm::Итераций_Click);
 			// 
@@ -509,27 +509,27 @@ namespace Project1
 
 		}
 #pragma endregion
-		String^ TorZ; // Точка или запятая
+		String^ TorZ; 
 
 	private: void checkTextBox(System::Windows::Forms::TextBox^ textBox, System::Windows::Forms::KeyPressEventArgs^ e) {
-		bool TZFound = false; // Разделительный знак найден?
-		String^ FirstChar; //знаки + и - разрешены первым символом
+		bool TZFound = false; 
+		String^ FirstChar; 
 		FirstChar = "";
 		if (textBox->Text->Length > 0) FirstChar = textBox->Text->Substring(0, 1);
 		bool badPosition = ((FirstChar == L"-" || FirstChar == L"+") && textBox->SelectionStart == 0);
 		if (Char::IsDigit(e->KeyChar) == true) {
 			if (badPosition) e->Handled = true;
-			return; //Найдена цифра
+			return; 
 		}
-		if (e->KeyChar == (char)Keys::Back) return; //Найден BackSpace
+		if (e->KeyChar == (char)Keys::Back) return; 
 		if (e->KeyChar == L'-' || e->KeyChar == L'+') {
 			if (FirstChar == L"-" || FirstChar == L"+") textBox->Text = textBox->Text->Substring(1);
 			if (textBox->SelectionStart == 0) return;
 		}
-		if (textBox->Text->IndexOf(TorZ) != -1) TZFound = true; //Найден разделитель целой и дробной частей
-		if (TZFound == true) { e->Handled = true; return; } //Уже есть, второй не добавляем
-		if (e->KeyChar.ToString() == TorZ && !badPosition) return; //А первый - можно
-		e->Handled = true; //Не разрешать дальнейшую обработку
+		if (textBox->Text->IndexOf(TorZ) != -1) TZFound = true; 
+		if (TZFound == true) { e->Handled = true; return; } 
+		if (e->KeyChar.ToString() == TorZ && !badPosition) return;
+		e->Handled = true; 
 	}
 	
 private: System::Void MyForm_Load(System::Object ^ sender, System::EventArgs ^ e) {
@@ -564,8 +564,6 @@ private: System::Void MyForm_Load(System::Object ^ sender, System::EventArgs ^ e
 
 	private: System::Void Половинного_деления_Click(System::Object ^ sender, System::EventArgs ^ e)
 	{
-		left->Enabled = true;
-		right->Enabled = true;
 		if (tochnost->TextLength == 0)
 			MessageBox::Show("Вы не ввели точность. Пожалуйста, введите точность вычислений.", "Ошибка");
 		else if (power2->TextLength == 0 || power1->TextLength == 0 || power0->TextLength == 0)
@@ -598,9 +596,6 @@ private: System::Void MyForm_Load(System::Object ^ sender, System::EventArgs ^ e
 
 	private: System::Void Ньютона_Click(System::Object ^ sender, System::EventArgs ^ e)
 	{
-
-		left->Enabled = true;
-		right->Enabled = true;
 		if (tochnost->TextLength == 0)
 			MessageBox::Show("Вы не ввели точность. Пожалуйста, введите точность вычислений.", "Ошибка");
 		else if (power2->TextLength == 0 || power1->TextLength == 0 || power0->TextLength == 0)
@@ -635,14 +630,10 @@ private: System::Void MyForm_Load(System::Object ^ sender, System::EventArgs ^ e
 		power0->Clear();
 		power1->Clear();
 		power2->Clear();
-		left->Enabled = true;
-		right->Enabled = true;
 	}
 
 	private: System::Void Сбросить_метод_Click(System::Object ^ sender, System::EventArgs ^ e) 
 	{
-		left->Enabled = true;
-		right->Enabled = true;
 		result->Clear();
 	}
 
