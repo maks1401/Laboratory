@@ -5,6 +5,7 @@
 bool P0 = false;
 bool P1 = false;
 bool P2 = false;
+using namespace std;
 namespace Project1
 {
 	using namespace System;
@@ -536,9 +537,6 @@ private: System::Void MyForm_Load(System::Object ^ sender, System::EventArgs ^ e
 }
 	private: System::Void Итераций_Click(System::Object^ sender, System::EventArgs^ e)
 	{
-		double x, y, z;
-		left->Enabled = false;
-		right->Enabled = false;
 		if (tochnost->TextLength == 0)
 			MessageBox::Show("Вы не ввели точность. Пожалуйста, введите точность вычислений.", "Ошибка");
 		else if (power2->TextLength == 0 || power1->TextLength == 0 || power0->TextLength == 0)
@@ -551,14 +549,15 @@ private: System::Void MyForm_Load(System::Object ^ sender, System::EventArgs ^ e
 			{
 				try
 				{
-					result->Text = System::Convert::ToString(root3(System::Convert::ToDouble(power2->Text), System::Convert::ToDouble(power1->Text), System::Convert::ToDouble(power0->Text), System::Convert::ToDouble(tochnost->Text), 0));
+					result->Text = System::Convert::ToString(root3(System::Convert::ToDouble(power2->Text), System::Convert::ToDouble(power1->Text), System::Convert::ToDouble(power0->Text), System::Convert::ToDouble(tochnost->Text), System::Convert::ToDouble(left->Text)));
+					if (System::Convert::ToDouble(result->Text) == std::numeric_limits<double>::infinity() || System::Convert::ToDouble(result->Text) == -std::numeric_limits<double>::infinity())
+						MessageBox::Show("Корней нет", "Ошибка");
 				}
 				catch(...)
 				{
 					MessageBox::Show("Тип данных", "Ошибка");
 				}				
-				if (result->TextLength == 2 || result->TextLength == 1)
-					MessageBox::Show("Корней нет", "Ошибка");
+				
 			}				
 		}
 	}
@@ -577,9 +576,22 @@ private: System::Void MyForm_Load(System::Object ^ sender, System::EventArgs ^ e
 				MessageBox::Show("Вы не ввели диапазон. Для метода половинного деления необходимо указать диапазон изолированного корня.", "Ошибка");
 			else
 			{
-				result->Text = System::Convert::ToString(root1(System::Convert::ToDouble(power2->Text), System::Convert::ToDouble(power1->Text), System::Convert::ToDouble(power0->Text), System::Convert::ToDouble(left->Text), System::Convert::ToDouble(right->Text), System::Convert::ToDouble(tochnost->Text)));
-				
-				
+				try 
+				{
+					result->Text = System::Convert::ToString(root1(System::Convert::ToDouble(power2->Text), System::Convert::ToDouble(power1->Text), System::Convert::ToDouble(power0->Text), System::Convert::ToDouble(left->Text), System::Convert::ToDouble(right->Text), System::Convert::ToDouble(tochnost->Text)));
+					double x = System::Convert::ToDouble(result->Text);
+					double y = round(x);
+					if (System::Convert::ToDouble(result->Text) == std::numeric_limits<double>::infinity() || System::Convert::ToDouble(result->Text) == -std::numeric_limits<double>::infinity() || y == System::Convert::ToDouble(right->Text))
+					{
+						result->Clear();
+						MessageBox::Show("Корней в заданном диапазоне нет", "Ошибка");
+					}
+						
+				}
+				catch (...)
+				{
+					MessageBox::Show("Тип данных", "Ошибка");
+				}				
 			}		
 		}
 	}
@@ -599,10 +611,17 @@ private: System::Void MyForm_Load(System::Object ^ sender, System::EventArgs ^ e
 				MessageBox::Show("Вы не ввели диапазон. Для метода половинного деления необходимо указать диапазон изолированного корня.", "Ошибка");
 			else
 			{
-				double x = (System::Convert::ToDouble(left->Text) + System::Convert::ToDouble(right->Text)) / 2;
-				result->Text = System::Convert::ToString(root3(System::Convert::ToDouble(power2->Text), System::Convert::ToDouble(power1->Text), System::Convert::ToDouble(power0->Text), System::Convert::ToDouble(tochnost->Text), x));
-				if (result->TextLength == 2 || result->TextLength == 1)
-					MessageBox::Show("В заданном диапазоне нет корня.", "Ошибка");
+				try
+				{
+					double x = (System::Convert::ToDouble(left->Text) + System::Convert::ToDouble(right->Text)) / 2;
+					result->Text = System::Convert::ToString(root3(System::Convert::ToDouble(power2->Text), System::Convert::ToDouble(power1->Text), System::Convert::ToDouble(power0->Text), System::Convert::ToDouble(tochnost->Text), x));
+					if (System::Convert::ToDouble(result->Text) == std::numeric_limits<double>::infinity() || System::Convert::ToDouble(result->Text) == -std::numeric_limits<double>::infinity())
+						MessageBox::Show("Корней нет", "Ошибка");
+				}
+				catch (...)
+				{
+					MessageBox::Show("Тип данных", "Ошибка");
+				}				
 			}
 		}
 	}
